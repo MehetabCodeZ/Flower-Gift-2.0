@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Something Special for You 🎀</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --text-dark: #7b3f66;
+      --text-mid:  #c4789a;
+    }
+
+    html, body {
+      font-family: 'Nunito', sans-serif;
+      overflow: hidden;
+      height: 100%;
+      height: 100dvh;
+      width: 100vw;
+    }
+
+    /* ── PAGE SYSTEM ── */
+    .page {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s ease;
+      overflow: hidden;
+    }
+    .page.active { opacity: 1; pointer-events: all; }
+
+    /* Backgrounds */
+    #page1 { background: radial-gradient(ellipse at 50% 40%, #fff5fb 0%, #fce4ec 55%, #f8d0e5 100%); }
+    #page2 { background: radial-gradient(ellipse at 50% 40%, #fff5fb 0%, #fce4ec 50%, #f3e5f5 100%); }
+    #page3 { background: radial-gradient(ellipse at 50% 40%, #fff0f8 0%, #ffd6e8 55%, #ffbcd9 100%); }
+    #page4 { background: radial-gradient(ellipse at 50% 40%, #fff5fb 0%, #fce4ec 45%, #f8bbd0 100%); }
+
+    /* White pixels → invisible on pink bg */
+    .blend { mix-blend-mode: multiply; }
+
+    /* ── CONTENT wrapper ── */
+    .content {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: clamp(12px, 3vw, 22px);
+      padding: clamp(16px, 4vw, 28px) clamp(16px, 5vw, 32px);
+      width: 100%;
+      max-width: 480px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      border-radius: 50px;
+      border: none;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      letter-spacing: 0.5px;
+      font-size:  clamp(0.9rem, 3.5vw, 1.1rem);
+      padding:    clamp(11px, 2.5vw, 14px) clamp(24px, 6vw, 40px);
+      white-space: nowrap;
+    }
+    .btn-pink {
+      background: linear-gradient(135deg, #f9c6d8, #f48fb1);
+      color: #fff;
+      box-shadow: 0 6px 22px rgba(244,143,177,0.4);
+    }
+    .btn-pink:hover  { transform: scale(1.07) translateY(-2px); background: linear-gradient(135deg, #f48fb1, #e91e8c); }
+    .btn-yes {
+      background: linear-gradient(135deg, #f8bbd0, #f06292);
+      color: #fff;
+      font-size:  clamp(1rem, 4vw, 1.25rem);
+      padding:    clamp(12px, 2.8vw, 15px) clamp(30px, 8vw, 52px);
+      box-shadow: 0 6px 24px rgba(240,98,146,0.45);
+    }
+    .btn-yes:hover   { transform: scale(1.08) translateY(-3px); }
+    .btn-no {
+      background: transparent;
+      color: var(--text-mid);
+      border: 2.5px solid #f8bbd0;
+    }
+    .btn-no:hover    { background: #fce4ec; transform: scale(1.04); }
+    .btn-change {
+      background: linear-gradient(135deg, #ffc8da, #ff8fab);
+      color: #fff;
+      box-shadow: 0 6px 22px rgba(255,143,171,0.45);
+    }
+    .btn-change:hover { transform: scale(1.07) translateY(-2px); }
+
+    /* ═══════════════════════════
+       PAGE 1 — GIFT BOX
+    ═══════════════════════════ */
+    .gift-wrapper {
+      cursor: pointer;
+      animation: floatGift 5s ease-in-out infinite;
+    }
+    .gift-wrapper:hover { filter: brightness(1.05) drop-shadow(0 10px 28px rgba(244,143,177,0.5)); }
+    @keyframes floatGift {
+      0%,100% { transform: translateY(0px) rotate(-1.5deg) scale(1); }
+      50%      { transform: translateY(-18px) rotate(1.5deg) scale(1.02); }
+    }
+    .gift-wrapper.opening {
+      animation: openGift 0.9s ease forwards !important;
+    }
+    @keyframes openGift {
+      0%   { transform: scale(1) rotate(0deg); opacity:1; }
+      25%  { transform: scale(1.12) rotate(-4deg); }
+      50%  { transform: scale(0.9)  rotate(4deg); }
+      75%  { transform: scale(1.15) rotate(-2deg); opacity:.6; }
+      100% { transform: scale(0)    rotate(20deg); opacity:0; }
+    }
+    .gift-img {
+      width: clamp(180px, 55vw, 280px);
+    }
+
+    #page1 h2 {
+      font-size: clamp(1.05rem, 4.5vw, 1.6rem);
+      color: var(--text-dark);
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    /* Falling petals */
+    .petal {
+      position: absolute;
+      pointer-events: none;
+      animation: petalDrift linear infinite;
+      z-index: 2;
+    }
+    @keyframes petalDrift {
+      0%   { transform: translateY(-5vh) translateX(0) rotate(0deg); opacity:0; }
+      5%   { opacity:.75; }
+      95%  { opacity:.65; }
+      100% { transform: translateY(108vh) translateX(30px) rotate(540deg); opacity:0; }
+    }
+
+    /* ═══════════════════════════
+       PAGE 2 — PROPOSAL
+    ═══════════════════════════ */
+    .main-cat {
+      width: clamp(160px, 52vw, 270px);
+      margin-bottom: clamp(-60px, -14vw, -30px);
+      animation: catSway 5s ease-in-out infinite;
+    }
+    @keyframes catSway {
+      0%,100% { transform: translateY(0px) rotate(-1deg) scale(1); }
+      50%      { transform: translateY(-14px) rotate(1deg) scale(1.03); }
+    }
+
+    /* Floating emojis — page 2 */
+    .float-emoji {
+      position: absolute;
+      pointer-events: none;
+      z-index: 3;
+      animation: emojiDrift ease-in-out infinite;
+      user-select: none;
+    }
+    @keyframes emojiDrift {
+      0%,100% { transform: translateY(0px)   rotate(-4deg) scale(1);    opacity: 0.75; }
+      40%      { transform: translateY(-22px) rotate(5deg)  scale(1.05); opacity: 0.9; }
+      75%      { transform: translateY(-10px) rotate(-3deg) scale(0.97); opacity: 0.8; }
+    }
+
+    #page2 h1 {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(1.4rem, 6vw, 2.3rem);
+      color: var(--text-dark);
+      line-height: 1.2;
+    }
+    #page2 h2 {
+      font-size: clamp(0.95rem, 3.8vw, 1.4rem);
+      color: var(--text-mid);
+      font-weight: 700;
+    }
+    .btn-row {
+      display: flex;
+      gap: clamp(10px, 3vw, 20px);
+      margin-top: 4px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* Mini floating cats */
+    .float-cat {
+      position: absolute;
+      pointer-events: none;
+      z-index: 2;
+      animation: catDrift ease-in-out infinite;
+    }
+    @keyframes catDrift {
+      0%,100% { transform: translateY(0px)   rotate(-6deg) scale(1); }
+      35%      { transform: translateY(-18px) rotate(5deg)  scale(1.04); }
+      70%      { transform: translateY(-6px)  rotate(-3deg) scale(0.97); }
+    }
+
+    /* ═══════════════════════════
+       PAGE 3 — ANGY
+    ═══════════════════════════ */
+    .angy-cat {
+      width: clamp(180px, 68vw, 280px);
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(216,27,96,0.2);
+      animation: catSulk 4.5s ease-in-out infinite;
+    }
+    @keyframes catSulk {
+      0%,100% { transform: rotate(-2deg) scale(1); }
+      50%      { transform: rotate(2deg) scale(1.04); }
+    }
+    #page3 h1 {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(1.6rem, 7vw, 2.5rem);
+      color: #d81b60;
+    }
+    #page3 .sub {
+      font-size: clamp(0.9rem, 3.5vw, 1.2rem);
+      color: var(--text-mid);
+      font-weight: 700;
+    }
+
+    /* ═══════════════════════════
+       PAGE 4 — LOVE
+    ═══════════════════════════ */
+    .love-cats {
+      display: flex;
+      gap: clamp(12px, 4vw, 24px);
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .love-cat1 {
+      width: clamp(120px, 36vw, 200px);
+      animation: catSway 4.5s ease-in-out infinite;
+    }
+    .love-cat2 {
+      width: clamp(110px, 33vw, 185px);
+      animation: catSway 5.5s 0.8s ease-in-out infinite;
+    }
+    #page4 h1 {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(1.7rem, 7.5vw, 2.7rem);
+      color: #c2185b;
+      animation: heartbeat 2.5s ease-in-out infinite;
+    }
+    @keyframes heartbeat {
+      0%,100% { transform: scale(1); }
+      40%      { transform: scale(1.07); }
+      55%      { transform: scale(0.97); }
+      70%      { transform: scale(1.04); }
+    }
+    #page4 h2 {
+      font-size: clamp(0.9rem, 3.5vw, 1.25rem);
+      color: var(--text-mid);
+      font-weight: 700;
+    }
+    #page4 .forever {
+      font-size: clamp(0.85rem, 3.2vw, 1.05rem);
+      color: var(--text-mid);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* Floating hearts */
+    .heart-float {
+      position: absolute;
+      pointer-events: none;
+      z-index: 1;
+      animation: heartRise linear infinite;
+    }
+    @keyframes heartRise {
+      0%   { transform: translateY(110vh) scale(0.4) rotate(-10deg); opacity:0; }
+      8%   { opacity:1; }
+      92%  { opacity:.85; }
+      100% { transform: translateY(-10vh) scale(1.3) rotate(15deg); opacity:0; }
+    }
+
+    /* ── TRANSITION OVERLAY ── */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, #fce4ec 0%, #f8bbd0 100%);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    #overlay.flash { opacity:1; pointer-events:all; }
+
+    /* Confetti burst */
+    .burst-emoji {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      animation: burstOut 1.3s ease forwards;
+    }
+    @keyframes burstOut {
+      0%   { transform: translate(0,0) scale(0); opacity:1; }
+      100% { transform: translate(var(--tx),var(--ty)) scale(1.4); opacity:0; }
+    }
+
+    /* ── MOBILE TWEAKS (<430px) ── */
+    @media (max-width: 430px) {
+      .content { gap: 10px; padding: 14px 14px; }
+      .btn-row  { gap: 10px; }
+    }
+
+    /* ── SHORT SCREEN (<650px height) ── */
+    @media (max-height: 650px) {
+      .content { gap: 8px; }
+      .gift-img, .main-cat, .angy-cat { width: clamp(120px, 38vh, 200px); }
+      .love-cat1 { width: clamp(90px, 26vh, 160px); }
+      .love-cat2 { width: clamp(80px, 24vh, 145px); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="overlay"></div>
+
+<!-- ══════════════════════════════
+     PAGE 1 — GIFT BOX
+══════════════════════════════ -->
+<div id="page1" class="page active">
+  <div id="p1-petals" style="position:absolute;inset:0;pointer-events:none;z-index:2;overflow:hidden;"></div>
+
+  <div class="content">
+    <div class="gift-wrapper" id="giftBox" onclick="openGift()">
+      <img class="gift-img blend"
+           src="images/gift-box.png"
+           alt="Gift Box" />
+    </div>
+
+    <h2>I have a gift for you cutie&nbsp;🎀</h2>
+    <button class="btn btn-pink" onclick="openGift()">🎁&nbsp;&nbsp;Open your surprise!</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE 2 — PROPOSAL
+══════════════════════════════ -->
+<div id="page2" class="page">
+  <div id="p2-floats" style="position:absolute;inset:0;pointer-events:none;z-index:2;overflow:hidden;"></div>
+
+  <div class="content">
+    <img class="main-cat blend"
+         src="images/cat-tulips.png"
+         alt="Cat with flowers" />
+
+    <h1>Flowers for you!!&nbsp;&lt;3</h1>
+    <h2>May I be yours, Ashika?&nbsp;👀</h2>
+
+    <div class="btn-row">
+      <button class="btn btn-yes" onclick="goToPage(4)">Yes&nbsp;🥰</button>
+      <button class="btn btn-no"  onclick="goToPage(3)">No&nbsp;🙈</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE 3 — ANGY
+══════════════════════════════ -->
+<div id="page3" class="page">
+  <div class="content">
+    <img class="angy-cat"
+         src="images/cat-angy.jpg"
+         alt="Angy cat" />
+
+    <h1>WHYY??&nbsp;😭</h1>
+    <p class="sub">You hurt my feelings&nbsp;😔💔</p>
+    <button class="btn btn-change" onclick="goToPage(2)">I change my mind&nbsp;😅</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE 4 — LOVE
+══════════════════════════════ -->
+<div id="page4" class="page">
+  <div id="p4-hearts" style="position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden;"></div>
+
+  <div class="content">
+    <h1>I Love you&nbsp;😘</h1>
+    <h2>You just made me the happiest&nbsp;🥹✨</h2>
+
+    <div class="love-cats">
+      <img class="love-cat1 blend"
+           src="images/cat-tulips.png"
+           alt="Cat with tulips" />
+      <img class="love-cat2 blend"
+           src="images/cat-cartoon.png"
+           alt="Cartoon cat with roses" />
+    </div>
+
+    <p class="forever">Forever yours&nbsp;💕</p>
+  </div>
+</div>
+
+<script>
+  let currentPage = 1;
+
+  /* ─── Responsive helpers ─── */
+  const isMobile = () => window.innerWidth <= 500;
+
+  /* ─── PAGE 1: Falling petals ─── */
+  (function() {
+    const c     = document.getElementById('p1-petals');
+    const items = ['🌸','💕','✨','🌷','💗','🩷','⭐','🌟'];
+    const count = isMobile() ? 14 : 22;
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      el.className = 'petal';
+      el.textContent = items[Math.floor(Math.random() * items.length)];
+      el.style.cssText = `
+        left:${Math.random()*100}%;
+        top:-5%;
+        font-size:${0.7 + Math.random()*0.9}rem;
+        animation-duration:${14 + Math.random()*10}s;
+        animation-delay:${-Math.random()*22}s;
+      `;
+      c.appendChild(el);
+    }
+  })();
+
+  /* ─── PAGE 2: Floating mini cats ─── */
+  function setupFloatingCats() {
+    const c   = document.getElementById('p2-floats');
+    c.innerHTML = '';
+    const src = 'images/cat-cartoon.png';
+
+    const allSpots = [
+      [3,2],[6,20],[4,42],[7,65],[3,85],[5,97],
+      [13,8],[16,30],[19,60],[14,88],
+      [77,0],[80,22],[83,48],[79,75],[76,95],
+      [88,12],[91,38],[87,62],[93,85],
+      [35,1],[50,99],[62,0],[70,98],[28,97],[45,1]
+    ];
+    const spots = isMobile() ? allSpots.filter((_,i) => i % 2 === 0) : allSpots;
+
+    spots.forEach(([top, left], i) => {
+      const img = document.createElement('img');
+      img.src   = src;
+      img.className = 'float-cat blend';
+      const size  = isMobile() ? (38 + (i%4)*8) : (50 + (i%5)*10);
+      const dur   = 4.5 + (i%7)*0.85;
+      const delay = -(i * 0.6);
+      img.style.cssText = `
+        position:absolute;
+        top:${top}%;
+        left:${left}%;
+        width:${size}px;
+        animation-duration:${dur}s;
+        animation-delay:${delay}s;
+        transform:rotate(${-18+(i%7)*7}deg);
+        opacity:0.82;
+      `;
+      c.appendChild(img);
+    });
+
+    /* ── 7 floating emojis scattered around ── */
+    const emojiSpots = [
+      { top:10,  left:12,  em:'💕', size:1.5, dur:5.5 },
+      { top:8,   left:78,  em:'🌸', size:1.3, dur:6.2 },
+      { top:38,  left:6,   em:'✨', size:1.2, dur:4.8 },
+      { top:55,  left:88,  em:'💗', size:1.4, dur:7.0 },
+      { top:72,  left:20,  em:'🌷', size:1.1, dur:5.2 },
+      { top:80,  left:72,  em:'💖', size:1.3, dur:6.5 },
+      { top:25,  left:50,  em:'⭐', size:1.0, dur:5.8 },
+    ];
+    emojiSpots.forEach((s, i) => {
+      const el = document.createElement('div');
+      el.className   = 'float-emoji';
+      el.textContent = s.em;
+      el.style.cssText = `
+        top:${s.top}%;
+        left:${s.left}%;
+        font-size:${s.size}rem;
+        animation-duration:${s.dur}s;
+        animation-delay:${-(i*0.9)}s;
+      `;
+      c.appendChild(el);
+    });
+  }
+  setupFloatingCats();
+
+  /* ─── PAGE 4: Rising hearts ─── */
+  function setupHearts() {
+    const c      = document.getElementById('p4-hearts');
+    c.innerHTML  = '';
+    const emojis = ['💕','💗','💖','💓','❤️','🌸','✨','💝','💞','🩷','🌷','🫶'];
+    const count  = isMobile() ? 18 : 30;
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      el.className = 'heart-float';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.cssText = `
+        left:${Math.random()*100}%;
+        font-size:${0.9 + Math.random()*1.5}rem;
+        animation-duration:${10 + Math.random()*10}s;
+        animation-delay:${-Math.random()*20}s;
+      `;
+      c.appendChild(el);
+    }
+  }
+  setupHearts();
+
+  /* ─── Gift open ─── */
+  function openGift() {
+    const box = document.getElementById('giftBox');
+    if (box.classList.contains('opening')) return;
+    box.classList.add('opening');
+    setTimeout(() => goToPage(2), 850);
+  }
+
+  /* ─── Page navigation ─── */
+  function goToPage(num) {
+    const ov = document.getElementById('overlay');
+    ov.classList.add('flash');
+    setTimeout(() => {
+      document.getElementById('page'+currentPage).classList.remove('active');
+      document.getElementById('page'+num).classList.add('active');
+      currentPage = num;
+      if (num === 1) document.getElementById('giftBox').classList.remove('opening');
+      if (num === 4) { setupHearts(); launchBurst(); }
+      ov.classList.remove('flash');
+    }, 480);
+  }
+
+  /* ─── Confetti burst on Yes ─── */
+  function launchBurst() {
+    const emojis = ['🎉','💕','✨','🌸','💖','🎊','🩷','💗','🌷'];
+    const count  = isMobile() ? 14 : 20;
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      el.className = 'burst-emoji';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      const angle = (i/count)*360;
+      const dist  = isMobile() ? (80 + Math.random()*60) : (130 + Math.random()*100);
+      const rad   = angle*Math.PI/180;
+      el.style.cssText = `
+        top:50%;left:50%;
+        font-size:${1.1 + Math.random()*0.7}rem;
+        animation-delay:${Math.random()*0.4}s;
+        --tx:${Math.cos(rad)*dist}px;
+        --ty:${Math.sin(rad)*dist}px;
+      `;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1600);
+    }
+  }
+
+  /* ─── Re-setup floating elements on orientation change ─── */
+  window.addEventListener('resize', () => {
+    if (currentPage === 2) setupFloatingCats();
+    if (currentPage === 4) setupHearts();
+  });
+</script>
+</body>
+</html>
